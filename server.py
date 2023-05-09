@@ -133,7 +133,6 @@ def update():
         return jsonify({'message': "Somthing went Wrong"})
 
 
-
 @app.route('/changePassword',methods= ['POST'])
 def change():
     try:
@@ -151,6 +150,7 @@ def change():
         return jsonify({"message":"Done"})
     except:
         return jsonify({'message': "Somthing went Wrong"})
+
 
 
 # Nady Part
