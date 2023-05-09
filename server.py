@@ -351,8 +351,135 @@ def rentingdetails():
 
 
 
+# Kareem Part
 
+
+#when we get to this endpoint
+@app.route("/latestten")   
+def get_latest_ten():
+    try:
+    
+        cursor = myDB.cursor()
+        query = "SELECT * FROM House ORDER BY publishDate DESC LIMIT 10"
+        cursor.execute(query)
+        result = cursor.fetchall()
+        cursor.close()
+    
+        return {"message:":"Done","data":result}
+    except:
+        return {"message:":"Wrong"}
+
+
+@app.route("/AvailableHouses")
+def Get_Availabe():
+    try:
+        cursor = myDB.cursor()
+        query = "SELECT * FROM House WHERE avilable = 1 " #sql code to get the most recent 10 houses 
+        cursor.execute(query)
+        result = cursor.fetchall()
+        print(result)
+        cursor.close()
+        return {"message:":"Done","data":result}
+    except:
+        return {"message:":"Wrong"}
+
+@app.route("/HouseDetails")
+def view_details():
+    try:
+        id = request.args.get("id")
+        if id ==None:
+            return {"message:":"Wrong"}
+        
+        cursor = myDB.cursor()
+        query = f"SELECT * FROM House WHERE id = {id}" #sql code to get the most recent 10 houses 
+        cursor.execute(query)
+        result = cursor.fetchone()
+        cursor.close()
+        return {"message:":"Done","data":result}
+    except:
+        return {"message:":"Wrong"}
+    
+            
+@app.route("/booking", methods=["POST"])
+def renter_booking():
+    try:
+
+        # Parse request body for booking details
+        data = request.json
+        user_id = data["userId"]
+        House_id = data["HouseId"]
+        start_date = data["startDate"]
+        end_date = data["endDate"]
+        price = data["price"]
+        willRenew = data["willRenew"]
+
+        
+        # Insert booking details into database
+        cursor = myDB.cursor()
+        query = f"INSERT INTO RentingActivity VALUES (default , {House_id}, {user_id}, '{start_date}', '{end_date}', {price},{willRenew})"
+        cursor.execute(query)
+        myDB.commit()
+        # Return success response
+        return {"message:":"Done"}
+        
+
+    except:
+        return {"message:":"Wrong"}
+
+
+@app.route('/unbooking', methods=['POST'])
+def unbooking():
+    try:
+        print("Hello")
+        # Extract data from JSON payload
+        data = request.json
+        userID = data['userId']
+        HouseID = data['HouseId']
+        print(f"Hello {userID}, {HouseID}")
+
+        # Connect to database and execute query
+        cursor = myDB.cursor()
+        query = f"DELETE FROM RentingActivity WHERE userID = {userID} AND HouseID = {HouseID}"
+        cursor.execute(query)
+        myDB.commit()
+        cursor.close()
+
+        # Return success message
+        return {"message:":"Done"}
+    except:
+        return {"message:":"Wrong"}
+
+
+
+@app.route("/extendbooking", methods=["POST"])
+def extend_booking():
+    try:
+
+        cursor = myDB.cursor()
+        # Get data from request JSON
+        data = request.json
+        booking_id = data["bookingID"]
+        extensionDate = data["extensionDays"]
+
+        # Get current checkout date and calculate new checkout date
+        query = f"SELECT * FROM RentingActivity WHERE id = {booking_id}"
+        cursor.execute(query)
+        result = cursor.fetchone()
+        print(result)
+        if result ==None:
+            return {"message:":"Wrong"}
+        
+        # Update checkout date in database
+        query = f"UPDATE RentingActivity SET endDate = '{extensionDate}' WHERE id = {booking_id}"
+        print(query)
+        cursor.execute(query)
+        myDB.commit()
+
+        return {"message:":"Done"}
+    except:
+        return {"message:":"Wrong"}
+    
 
 
 if __name__ == '__main__':
-    app.run(debug=True,port=8000)
+    app.run(debug=True,port=5000)
