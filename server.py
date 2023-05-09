@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, make_response
 import jwt
 import mysql.connector
 from flask_cors import CORS
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
 CORS(app)
@@ -27,12 +28,14 @@ def login():
 
     # Check if the user exists in the Users table
     query = f"SELECT * FROM User WHERE email = '{email}' AND password = '{password}'"
+    print(query)
     cursor.execute(query)
     user = cursor.fetchone()
     cursor.close()
-    print()
+    print(user)
     # Close the database connection
     if user:
+        print("INside ")
         # Generate JWT token
         payload = {
             'id': user[0],
@@ -44,18 +47,18 @@ def login():
         token = jwt.encode(payload, 'oskun', algorithm='HS256')
 
         # Set JWT as a cookie in the response
-        response = make_response(jsonify({'message': 'Login successful',"token":token}))
+        response = make_response(jsonify({'massege': 'Done',"token":token}))
         response.set_cookie('token', token)
 
         return response, 200
     else:
-        return jsonify({'message': 'Wrong Data'}), 200
+        return jsonify({'massege': 'Somthing went Wrong'}), 200
 
 
 
 
 # Endpoint for user signup
-@app.route('/signup', methods=['POST'])
+@app.route('/register', methods=['POST'])
 def signup():
     try:
         email = request.json.get('email')
@@ -63,6 +66,7 @@ def signup():
         phonenumber = request.json.get('phonenumber')
         password = request.json.get('password')
         imgDir = 'https;//None.png'
+
         # Connect to the MySQL database
         cursor = myDB.cursor()
 
@@ -75,10 +79,9 @@ def signup():
 
 
         # Insert a new user into the Users table
-        query = "INSERT INTO Users (email, name, phonenumber, password, imgDir) VALUES ('%s', '%s', '%s', '%s', '%s')"
-        cursor.execute(query, (email, name, phonenumber, password, imgDir))
+        query = f"INSERT INTO User VALUES (default, '{name}', '{email}', '{password}', '{phonenumber}', 1,'{imgDir}')"
+        cursor.execute(query)
         myDB.commit()
-
 
 
 
@@ -86,10 +89,9 @@ def signup():
         query = f"SELECT * FROM User WHERE email = '{email}'"
         cursor.execute(query)
         newUser = cursor.fetchall()[0]
-        print(newUser)
         # Close the database connection
-        cursor.close()
 
+        cursor.close()
         # Generate JWT token
         payload = {
             'id':newUser[0],
@@ -101,7 +103,46 @@ def signup():
         token = jwt.encode(payload, 'oskun', algorithm='HS256')
 
         # Return the token in the response
-        return jsonify({"massege":"User Saved",'token': token})
+        return jsonify({"massege":"Done",'token': token})
+    except:
+        return jsonify({'massege': "Somthing went Wrong"})
+
+
+
+@app.route('/updatepassword',methods= ['POST'])
+def update():
+    try:
+        email = request.json.get("email")
+        password = request.json.get("password")
+
+        cursor = myDB.cursor() 
+
+        # Insert a new user into the Users table
+        query = f"UPDATE User SET password = '{password}' WHERE email = '{email}'"
+        print(query)
+        cursor.execute(query)
+        myDB.commit()
+        cursor.close()
+        return jsonify({"massege":"Done"})
+    except:
+        return jsonify({'massege': "Somthing went Wrong"})
+
+
+@app.route('/changePassword',methods= ['POST'])
+def change():
+    try:
+        email = request.json.get("email")
+        # oldpassword = request.json.get("oldpassword")
+        newpassword = request.json.get("newpassword")
+
+        cursor = myDB.cursor() 
+        # Insert a new user into the Users table
+        query = f"UPDATE User SET password = '{newpassword}' WHERE email = '{email}'"
+        print(query)
+        cursor.execute(query)
+        myDB.commit()
+        cursor.close()
+        return jsonify({"massege":"Done"})
     except:
         return jsonify({'massege': "Somthing went Wrong"})
 
