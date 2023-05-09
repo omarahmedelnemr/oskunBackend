@@ -52,12 +52,12 @@ def login():
         token = jwt.encode(payload, 'oskun', algorithm='HS256')
 
         # Set JWT as a cookie in the response
-        response = make_response(jsonify({'massege': 'Done',"token":token}))
+        response = make_response(jsonify({'message': 'Done',"token":token}))
         response.set_cookie('token', token)
 
         return response, 200
     else:
-        return jsonify({'massege': 'Somthing went Wrong'}), 200
+        return jsonify({'message': 'Somthing went Wrong'}), 200
 
 
 
@@ -79,7 +79,7 @@ def signup():
         query = f"SELECT * FROM User WHERE email = '{email}'"
         cursor.execute(query)
         if cursor.fetchall() !=[]:
-             return {"massege":"Email Are Already in Use"}
+             return {"message":"Email Are Already in Use"}
         
 
 
@@ -108,9 +108,9 @@ def signup():
         token = jwt.encode(payload, 'oskun', algorithm='HS256')
 
         # Return the token in the response
-        return jsonify({"massege":"Done",'token': token})
+        return jsonify({"message":"Done",'token': token})
     except:
-        return jsonify({'massege': "Somthing went Wrong"})
+        return jsonify({'message': "Somthing went Wrong"})
 
 
 
@@ -128,9 +128,9 @@ def update():
         cursor.execute(query)
         myDB.commit()
         cursor.close()
-        return jsonify({"massege":"Done"})
+        return jsonify({"message":"Done"})
     except:
-        return jsonify({'massege': "Somthing went Wrong"})
+        return jsonify({'message': "Somthing went Wrong"})
 
 
 @app.route('/changePassword',methods= ['POST'])
@@ -147,9 +147,9 @@ def change():
         cursor.execute(query)
         myDB.commit()
         cursor.close()
-        return jsonify({"massege":"Done"})
+        return jsonify({"message":"Done"})
     except:
-        return jsonify({'massege': "Somthing went Wrong"})
+        return jsonify({'message': "Somthing went Wrong"})
 
 
 # Nady Part
@@ -160,7 +160,7 @@ def index():
     arb = request.args
     id = arb.get('id') 
     if id ==None:
-        return {"massege":"Wrong"}
+        return {"message":"Somthing went Wrong"}
     else:
         try:
 
@@ -168,21 +168,21 @@ def index():
             usr = cursor.fetchall()
 
             myDB.commit() 
-            return {"massege":"Done","data":usr}
+            return {"message":"Done","data":usr}
         except:
-            return {"massege":"Wrong"}
+            return {"message":"Somthing went Wrong"}
 
 @app.route("/favorite")
 def getfv():
     f = request.args
     id =f.get('id') 
     if id ==None:
-        return {"massege":"Wrong"}
+        return {"message":"Somthing went Wrong"}
     else:
         cursor.execute(f"SELECT * FROM Favorite WHERE id = {id} " )
         fav = cursor.fetchone()
         myDB.commit()
-        return {"massege":"Done","data":fav}
+        return {"message":"Done","data":fav}
 
 @app.route('/updateuser', methods=['POST'])
 def update_user():
@@ -202,21 +202,21 @@ def update_user():
         cursor.execute(sql)
         myDB.commit()
         
-        return {"massege":"Done"}
+        return {"message":"Done"}
     except:
-        return {"massege":"Wrong"}
+        return {"message":"Somthing went Wrong"}
 
 @app.route("/history" , methods = ['POST', 'GET'])
 def hist():
     arb = request.args
     id = arb.get('id')
     if id ==None:
-        return {"massege":"Wrong"}
+        return {"message":"Somthing went Wrong"}
     else:
         cursor.execute(f"SELECT * FROM History WHERE id =  {id}" )
         his = cursor.fetchall()
         myDB.commit() 
-        return {"massege":"Done","data":his}
+        return {"message":"Done","data":his}
 
 @app.route('/addhouse', methods=['POST'])
 def add_property():
@@ -244,9 +244,9 @@ def add_property():
         cursor.execute(sql)
         myDB.commit()
         
-        return {"massege":"Done"}
+        return {"message":"Done"}
     except:
-        return {"massege":"Wrong"}
+        return {"message":"Somthing went Wrong"}
 
 
 
@@ -277,9 +277,9 @@ def edit_property():
         cursor.execute(sql)
         myDB.commit()
         
-        return {"massege":"Done"}
+        return {"message":"Done"}
     except:
-        return {"massege":"Wrong"}
+        return {"message":"Somthing went Wrong"}
         
 
 
@@ -288,7 +288,7 @@ def delete_property():
     
     idd = request.json.get('id')
     if idd == None:
-        return {"massege":"Wrong"}
+        return {"message":"Somthing went Wrong"}
     else:
 
         sql = f"DELETE FROM Favorite WHERE HouseID = {idd}"
@@ -298,7 +298,7 @@ def delete_property():
         cursor.execute(sql)
         myDB.commit()
         
-        return {"massege":"Done"}
+        return {"message":"Done"}
 
 
 
@@ -311,13 +311,13 @@ def rate_property():
     idd = request.json.get('id')
     rating = request.json.get('rating')
     if idd ==None or rating == None:
-        return {"massege":"Wrong"}
+        return {"message":"Somthing went Wrong"}
     else:
         sql = f"UPDATE House SET rating = {rating} WHERE id = {idd}"
         cursor.execute(sql)
         myDB.commit()
         
-        return {"massege":"Done"}
+        return {"message":"Done"}
 
 
 
@@ -328,7 +328,7 @@ def rentingdetails():
     
         idd = request.json.get('HouseID')
         if idd ==None:
-           return {"massege":"Wrong"}
+           return {"message":"Somthing went Wrong"}
 
         sql = f"UPDATE House SET avilable = 1 WHERE id = {idd}"
         cursor.execute(sql)
@@ -343,9 +343,9 @@ def rentingdetails():
         cursor.execute(sql)
         
         myDB.commit()
-        return {"massege":"Done"}
+        return {"message":"Done"}
     except:
-        return {"massege":"Wrong"}
+        return {"message":"Somthing went Wrong"}
 
 
 
@@ -367,7 +367,7 @@ def get_latest_ten():
     
         return {"message:":"Done","data":result}
     except:
-        return {"message:":"Wrong"}
+        return {"message:":"Somthing went Wrong"}
 
 
 @app.route("/AvailableHouses")
@@ -381,14 +381,14 @@ def Get_Availabe():
         cursor.close()
         return {"message:":"Done","data":result}
     except:
-        return {"message:":"Wrong"}
+        return {"message:":"Somthing went Wrong"}
 
 @app.route("/HouseDetails")
 def view_details():
     try:
         id = request.args.get("id")
         if id ==None:
-            return {"message:":"Wrong"}
+            return {"message:":"Somthing went Wrong"}
         
         cursor = myDB.cursor()
         query = f"SELECT * FROM House WHERE id = {id}" #sql code to get the most recent 10 houses 
@@ -397,7 +397,7 @@ def view_details():
         cursor.close()
         return {"message:":"Done","data":result}
     except:
-        return {"message:":"Wrong"}
+        return {"message:":"Somthing went Wrong"}
     
             
 @app.route("/booking", methods=["POST"])
@@ -424,7 +424,7 @@ def renter_booking():
         
 
     except:
-        return {"message:":"Wrong"}
+        return {"message:":"Somthing went Wrong"}
 
 
 @app.route('/unbooking', methods=['POST'])
@@ -447,7 +447,7 @@ def unbooking():
         # Return success message
         return {"message:":"Done"}
     except:
-        return {"message:":"Wrong"}
+        return {"message:":"Somthing went Wrong"}
 
 
 
@@ -467,7 +467,7 @@ def extend_booking():
         result = cursor.fetchone()
         print(result)
         if result ==None:
-            return {"message:":"Wrong"}
+            return {"message:":"Somthing went Wrong"}
         
         # Update checkout date in database
         query = f"UPDATE RentingActivity SET endDate = '{extensionDate}' WHERE id = {booking_id}"
@@ -477,7 +477,7 @@ def extend_booking():
 
         return {"message:":"Done"}
     except:
-        return {"message:":"Wrong"}
+        return {"message:":"Somthing went Wrong"}
     
 
 
