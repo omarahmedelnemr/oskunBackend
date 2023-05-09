@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify, make_response,render_template_string
 import jwt
 import mysql.connector
 from flask_cors import CORS
-from flask_mail import Mail, Message
 import datetime
 
 
