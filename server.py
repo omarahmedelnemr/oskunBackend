@@ -118,7 +118,7 @@ def signup():
 def update():
     try:
         email = request.json.get("email")
-        password = request.json.get("password")
+        password = request.json.get("newPassword")
 
          
 
@@ -138,7 +138,7 @@ def change():
     try:
         email = request.json.get("email")
         # oldpassword = request.json.get("oldpassword")
-        newpassword = request.json.get("newpassword")
+        newpassword = request.json.get("newPassword")
 
          
         # Insert a new user into the Users table
