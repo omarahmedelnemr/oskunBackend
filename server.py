@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request, jsonify, make_response,render_template_string
 import jwt
 import mysql.connector
 from flask_cors import CORS
@@ -17,6 +17,10 @@ myDB = mysql.connector.connect(
 )
 
 mycursor = myDB.cursor()
+
+@app.route('/')
+def Home():
+   return  render_template_string('<h1 style="text-align:center">This is Our Server Running</h1>')
 
 # Endpoint for user login
 @app.route('/login', methods=['POST'])
@@ -147,4 +151,4 @@ def change():
         return jsonify({'massege': "Somthing went Wrong"})
 
 if __name__ == '__main__':
-    app.run()
+    app.run(port=8000)
