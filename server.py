@@ -208,7 +208,15 @@ def getfv():
         cursor.execute(f"SELECT * FROM Favorite WHERE userID = {id} " )
         fav = cursor.fetchall()
         fav = addLabels(fav,cursor.description,1)
-        return {"message":"Done","data":fav}
+
+
+        houseFavorite = []
+        for i in fav:
+            cursor.execute(f"SELECT * FROM House WHERE id = {i['HouseID']}")
+            house = cursor.fetchone()
+            house = addLabels(house,cursor.description,0)
+            houseFavorite.append(house) 
+        return {"message":"Done","data":houseFavorite}
 
 @app.route('/updateuser', methods=['POST'])
 def update_user():
