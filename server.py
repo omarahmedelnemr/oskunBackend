@@ -38,7 +38,7 @@ def login():
         print(query)
         cursor.execute(query)
         user = cursor.fetchall()
-        cursor.close()
+        
         print(user)
         # Close the database connection
         if len(user)!=0:
@@ -102,7 +102,7 @@ def signup():
         newUser = cursor.fetchall()[0]
         # Close the database connection
 
-        cursor.close()
+        
         # Generate JWT token
         payload = {
             'id':newUser[0],
@@ -133,7 +133,7 @@ def update():
         print(query)
         cursor.execute(query)
         myDB.commit()
-        cursor.close()
+        
         return jsonify({"message":"Done"})
     except:
         return jsonify({'message': "Somthing went Wrong"})
@@ -152,7 +152,7 @@ def change():
         print(query)
         cursor.execute(query)
         myDB.commit()
-        cursor.close()
+        
         return jsonify({"message":"Done"})
     except:
         return jsonify({'message': "Somthing went Wrong"})
@@ -370,7 +370,7 @@ def get_latest_ten():
         query = "SELECT * FROM House ORDER BY publishDate DESC LIMIT 10"
         cursor.execute(query)
         result = cursor.fetchall()
-        cursor.close()
+        
     
         return {"message:":"Done","data":result}
     except:
@@ -385,7 +385,7 @@ def Get_Availabe():
         cursor.execute(query)
         result = cursor.fetchall()
         print(result)
-        cursor.close()
+        
         return {"message:":"Done","data":result}
     except:
         return {"message:":"Somthing went Wrong"}
@@ -401,7 +401,7 @@ def view_details():
         query = f"SELECT * FROM House WHERE id = {id}" #sql code to get the most recent 10 houses 
         cursor.execute(query)
         result = cursor.fetchone()
-        cursor.close()
+        
         return {"message:":"Done","data":result}
     except:
         return {"message:":"Somthing went Wrong"}
@@ -449,7 +449,7 @@ def unbooking():
         query = f"DELETE FROM RentingActivity WHERE userID = {userID} AND HouseID = {HouseID}"
         cursor.execute(query)
         myDB.commit()
-        cursor.close()
+        
 
         # Return success message
         return {"message:":"Done"}
