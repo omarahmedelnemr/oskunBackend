@@ -17,7 +17,6 @@ myDB = mysql.connector.connect(
     database = 'oskun'    
 )
 
-cursor = myDB.cursor()
 
 
 def addLabels(data,legends, nasted):
@@ -43,7 +42,8 @@ def Home():
 # Endpoint for user login
 @app.route('/login', methods=['POST'])
 def login():
-    try:
+    try: 
+        cursor = myDB.cursor()
 
         email = request.json.get('email')
         password = request.json.get('password')
@@ -74,8 +74,11 @@ def login():
             response = make_response(jsonify({'message': 'Done',"token":token}))
             response.set_cookie('token', token)
             print ("Done")
+            cursor.close()
             return response, 200
         else:
+            cursor.close()
+
             print('Somthing went Wrong')
             return jsonify({'message': 'Somthing went Wrong'}), 200
     except:
@@ -88,7 +91,9 @@ def login():
 # Endpoint for user signup
 @app.route('/register', methods=['POST'])
 def signup():
-    try:
+    try: 
+        cursor = myDB.cursor()
+
         email = request.json.get('email')
         name = request.json.get('name')
         phonenumber = request.json.get('phonenumber')
@@ -102,6 +107,7 @@ def signup():
         query = f"SELECT * FROM User WHERE email = '{email}'"
         cursor.execute(query)
         if cursor.fetchall() !=[]:
+             cursor.close()
              return {"message":"Email Are Already in Use"}
         
 
@@ -131,6 +137,7 @@ def signup():
         token = jwt.encode(payload, 'oskun', algorithm='HS256')
 
         # Return the token in the response
+        cursor.close()
         return jsonify({"message":"Done",'token': token})
     except:
         return jsonify({'message': "Somthing went Wrong"})
@@ -140,6 +147,8 @@ def signup():
 @app.route('/updatepassword',methods= ['POST'])
 def update():
     try:
+        cursor = myDB.cursor()
+
         email = request.json.get("email")
         password = request.json.get("newPassword")
 
@@ -151,6 +160,7 @@ def update():
         cursor.execute(query)
         myDB.commit()
         
+        cursor.close()
         return jsonify({"message":"Done"})
     except:
         return jsonify({'message': "Somthing went Wrong"})
@@ -159,6 +169,8 @@ def update():
 @app.route('/changePassword',methods= ['POST'])
 def change():
     try:
+        cursor = myDB.cursor()
+
         email = request.json.get("email")
         # oldpassword = request.json.get("oldpassword")
         newpassword = request.json.get("newPassword")
@@ -170,6 +182,7 @@ def change():
         cursor.execute(query)
         myDB.commit()
         
+        cursor.close()
         return jsonify({"message":"Done"})
     except:
         return jsonify({'message': "Somthing went Wrong"})
@@ -187,6 +200,7 @@ def index():
         return {"message":"Somthing went Wrong"}
     else:
         try:
+            cursor = myDB.cursor()
 
             cursor.execute(f"SELECT * FROM User WHERE id = {id}" )
             usr = cursor.fetchone()
@@ -194,6 +208,7 @@ def index():
             # myDB.commit() 
             usr = addLabels(usr,cursor.description,0)
 
+            cursor.close()
             return {"message":"Done","data":usr}
         except:
             return {"message":"Somthing went Wrong"}
@@ -205,6 +220,8 @@ def getfv():
     if id ==None:
         return {"message":"Somthing went Wrong"}
     else:
+        cursor = myDB.cursor()
+
         cursor.execute(f"SELECT * FROM Favorite WHERE userID = {id} " )
         fav = cursor.fetchall()
         fav = addLabels(fav,cursor.description,1)
@@ -216,12 +233,14 @@ def getfv():
             house = cursor.fetchone()
             house = addLabels(house,cursor.description,0)
             houseFavorite.append(house) 
+        cursor.close()
         return {"message":"Done","data":houseFavorite}
 
 @app.route('/updateuser', methods=['POST'])
 def update_user():
 
     try:
+        cursor = myDB.cursor()
 
         idd = request.json.get('id')
         name = request.json.get('name')
@@ -236,6 +255,7 @@ def update_user():
         cursor.execute(sql)
         myDB.commit()
         
+        cursor.close()
         return {"message":"Done"}
     except:
         return {"message":"Somthing went Wrong"}
@@ -247,47 +267,71 @@ def hist():
     if id ==None:
         return {"message":"Somthing went Wrong"}
     else:
+        try:
+            cursor = myDB.cursor()
 
-        cursor.execute(f"SELECT * FROM History WHERE id =  {id}" )
-        his = cursor.fetchall()
+            cursor.execute(f"SELECT * FROM History WHERE id =  {id}" )
+            his = cursor.fetchall()
 
-        his = addLabels(his,cursor.description,1)
-        houseHistory = []
-        for i in his:
-            cursor.execute(f"SELECT * FROM House WHERE id = {i['house']}")
-            house = cursor.fetchone()
-            house = addLabels(house,cursor.description,0)
-            house['history'] = i
-            houseHistory.append(house) 
+            his = addLabels(his,cursor.description,1)
+            houseHistory = []
+            for i in his:
+                cursor.execute(f"SELECT * FROM House WHERE id = {i['house']}")
+                house = cursor.fetchone()
+                house = addLabels(house,cursor.description,0)
+                house['history'] = i
+                houseHistory.append(house) 
 
-        return {"message":"Done","data":houseHistory}
+            cursor.close()
+            return {"message":"Done","data":houseHistory}
+        except:
+            return {"message":"Somthing went Wrong"}
 
 @app.route('/addhouse', methods=['POST'])
 def add_property():
     try:
+        cursor = myDB.cursor()
+        
         owner = request.json.get('owner')
-        typ = request.json.get('type')
         name = request.json.get('name')
         location = request.json.get('location')
-        publishDate = datetime.datetime.now()
-        rating = request.json.get('rating')
+        description = request.json.get('description')
+        mainImg = request.json.get('mainImg')
+
+        images = request.json.get('images')
+
         rooms = request.json.get('rooms')
         beds = request.json.get('beds')
         baths = request.json.get('baths')
-
         size = request.json.get('size')
-        price = request.json.get('price') 
-        mainImg = request.json.get('mainImg')
-        avilable = request.json.get('avilable')
+        price = request.json.get('price')
+
         cash = request.json.get('cash')
+        typ = request.json.get('type')
         dayRent = request.json.get('dayRent')
-        weekRent = request.json.get('weekRent')
-        description = request.json.get('description')
+        weekRent = request.json.get('weekRent')        
         
-        sql = f"INSERT INTO House (owner, type, name, location, publishDate, rating, rooms, beds, size, price, mainImg, avilable, cash, dayRent, weekRent, description,baths) VALUES ({owner}, '{typ}', '{name}', '{location}', {publishDate}, {rating}, {rooms}, {beds}, {size}, {price}, '{mainImg}', {avilable}, {cash}, {dayRent}, {weekRent}, '{description}',{baths})"
+        publishDate = datetime.datetime.now()
+        rating = 2.5 #as it is Not Rated Yet #request.json.get('rating')
+        avilable = 1
+        
+        sql = f"INSERT INTO House (owner, type, name, location, publishDate, rating, rooms, beds, size, price, mainImg, avilable, cash, dayRent, weekRent, description,baths) VALUES ({owner}, '{typ}', '{name}', '{location}', '{publishDate}', {rating}, {rooms}, {beds}, {size}, {price}, '{mainImg}', {avilable}, {cash}, {dayRent}, {weekRent}, '{description}',{baths})"
         cursor.execute(sql)
         myDB.commit()
-        
+
+        houseID = cursor.lastrowid
+        print("Before")
+        cursor.execute(f"INSERT INTO images VALUES (default,{houseID},'{images[0]['imageDirectory']}')")
+        cursor.execute(f"INSERT INTO images VALUES (default,{houseID},'{images[1]['imageDirectory']}')")
+        print("After")
+        myDB.commit()
+
+        cursor.close()
+        # for i in images:
+        #     imageQuery+=f"INSERT INTO images VALUES (defualt,{houseID},'{i}');"
+        # print(imageQuery)
+        # cursor.execute(imageQuery)
+        # myDB.commit()
         return {"message":"Done"}
     except:
         return {"message":"Somthing went Wrong"}
@@ -297,6 +341,8 @@ def add_property():
 @app.route('/edithouse', methods=['POST'])
 def edit_property():
     try:
+        cursor = myDB.cursor()
+        
         idd = request.json.get('id')
         owner = request.json.get('owner')
         typ = request.json.get('type')
@@ -320,6 +366,7 @@ def edit_property():
         sql = f"UPDATE House SET owner = {owner}, type = '{typ}', name = '{name}', location = '{location}', publishDate = '{publishDate}', rating = {rating}, rooms = {rooms}, beds = {beds}, size = {size}, price = {price}, mainImg = '{mainImg}', avilable = {avilable}, cash = {cash}, dayRent = {dayRent}, weekRent = {weekRent}, description = '{description}', baths = {baths} WHERE id = {idd}"
         cursor.execute(sql)
         myDB.commit()
+        cursor.close()
         
         return {"message":"Done"}
     except:
@@ -334,6 +381,7 @@ def delete_property():
     if idd == None:
         return {"message":"Somthing went Wrong"}
     else:
+        cursor = myDB.cursor()
 
         sql = f"DELETE FROM Favorite WHERE HouseID = {idd}"
         cursor.execute(sql)
@@ -342,6 +390,7 @@ def delete_property():
         cursor.execute(sql)
         myDB.commit()
         
+        cursor.close()
         return {"message":"Done"}
 
 
@@ -357,10 +406,13 @@ def rate_property():
     if idd ==None or rating == None:
         return {"message":"Somthing went Wrong"}
     else:
+        cursor = myDB.cursor()
+        
         sql = f"UPDATE House SET rating = {rating} WHERE id = {idd}"
         cursor.execute(sql)
         myDB.commit()
         
+        cursor.close()
         return {"message":"Done"}
 
 
@@ -370,6 +422,8 @@ def rate_property():
 def rentingdetails():
     try:
     
+        cursor = myDB.cursor()
+        
         idd = request.json.get('HouseID')
         if idd ==None:
            return {"message":"Somthing went Wrong"}
@@ -387,6 +441,7 @@ def rentingdetails():
         cursor.execute(sql)
         
         myDB.commit()
+        cursor.close()
         return {"message":"Done"}
     except:
         return {"message":"Somthing went Wrong"}
@@ -404,12 +459,14 @@ def get_latest_ten():
     try:
     
         cursor = myDB.cursor()
+        
         query = "SELECT * FROM House WHERE avilable = 1 ORDER BY publishDate DESC LIMIT 10"
         cursor.execute(query)
         result = cursor.fetchall()
         
         result = addLabels(result,cursor.description,1)
 
+        cursor.close()
         return {"message":"Done","data":result}
     except:
         return {"message":"Somthing went Wrong"}
@@ -425,6 +482,7 @@ def Get_Availabe():
         result = cursor.fetchall()
 
         result = addLabels(result,cursor.description,1)        
+        cursor.close()
         return {"message":"Done","data":result}
     except:
         return {"message":"Somthing went Wrong"}
@@ -459,6 +517,7 @@ def view_details():
         #Put Images in All Data
         houseInfoResult['images'] = imagesInfo
 
+        cursor.close()
         return {"message":"Done","data":houseInfoResult}
     except:
         return {"message":"Somthing went Wrong"}
@@ -484,6 +543,7 @@ def renter_booking():
         cursor.execute(query)
         myDB.commit()
         # Return success response
+        cursor.close()
         return {"message":"Done"}
         
 
@@ -494,6 +554,7 @@ def renter_booking():
 @app.route('/unbooking', methods=['POST'])
 def unbooking():
     try:
+
         print("Hello")
         # Extract data from JSON payload
         data = request.json
@@ -509,6 +570,7 @@ def unbooking():
         
 
         # Return success message
+        cursor.close()
         return {"message":"Done"}
     except:
         return {"message":"Somthing went Wrong"}
@@ -539,6 +601,7 @@ def extend_booking():
         cursor.execute(query)
         myDB.commit()
 
+        cursor.close()
         return {"message":"Done"}
     except:
         return {"message":"Somthing went Wrong"}
