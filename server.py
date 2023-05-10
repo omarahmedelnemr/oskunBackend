@@ -56,11 +56,14 @@ def login():
             # Set JWT as a cookie in the response
             response = make_response(jsonify({'message': 'Done',"token":token}))
             response.set_cookie('token', token)
-
+            print ("Done")
             return response, 200
         else:
+            print('Somthing went Wrong')
             return jsonify({'message': 'Somthing went Wrong'}), 200
     except:
+            print('Somthing went Wrong')
+            
             return jsonify({'message': 'Somthing went Wrong'}), 200
 
 
