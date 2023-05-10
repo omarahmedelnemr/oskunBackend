@@ -19,6 +19,23 @@ myDB = mysql.connector.connect(
 
 cursor = myDB.cursor()
 
+
+def addLabels(data,legends, nasted):
+    singleDict = {}
+    result = []
+    if nasted:
+        for i in data:
+                for x  in range(len(i)):
+                    singleDict[legends[x][0]] = i[x]
+                result.append(singleDict)
+                singleDict = {}
+        return result
+    else:
+        for x  in range(len(data)):
+            singleDict[legends[x][0]] = data[x]
+        return singleDict
+
+
 @app.route('/')
 def Home():
    return  render_template_string('<h1 style="text-align:center">This is Our Server Running</h1>')
@@ -172,9 +189,11 @@ def index():
         try:
 
             cursor.execute(f"SELECT * FROM User WHERE id = {id}" )
-            usr = cursor.fetchall()
+            usr = cursor.fetchone()
 
-            myDB.commit() 
+            # myDB.commit() 
+            usr = addLabels(usr,cursor.description,0)
+
             return {"message":"Done","data":usr}
         except:
             return {"message":"Somthing went Wrong"}
@@ -186,9 +205,9 @@ def getfv():
     if id ==None:
         return {"message":"Somthing went Wrong"}
     else:
-        cursor.execute(f"SELECT * FROM Favorite WHERE id = {id} " )
-        fav = cursor.fetchone()
-        myDB.commit()
+        cursor.execute(f"SELECT * FROM Favorite WHERE userID = {id} " )
+        fav = cursor.fetchall()
+        fav = addLabels(fav,cursor.description,1)
         return {"message":"Done","data":fav}
 
 @app.route('/updateuser', methods=['POST'])
@@ -213,7 +232,7 @@ def update_user():
     except:
         return {"message":"Somthing went Wrong"}
 
-@app.route("/history" , methods = ['POST', 'GET'])
+@app.route("/history")
 def hist():
     arb = request.args
     id = arb.get('id')
@@ -222,7 +241,8 @@ def hist():
     else:
         cursor.execute(f"SELECT * FROM History WHERE id =  {id}" )
         his = cursor.fetchall()
-        myDB.commit() 
+
+        his = addLabels(his,cursor.description,1)
         return {"message":"Done","data":his}
 
 @app.route('/addhouse', methods=['POST'])
@@ -367,11 +387,12 @@ def get_latest_ten():
     try:
     
         cursor = myDB.cursor()
-        query = "SELECT * FROM House ORDER BY publishDate DESC LIMIT 10"
+        query = "SELECT * FROM House WHERE avilable = 1 ORDER BY publishDate DESC LIMIT 10"
         cursor.execute(query)
         result = cursor.fetchall()
         
-    
+        result = addLabels(result,cursor.description,1)
+
         return {"message:":"Done","data":result}
     except:
         return {"message:":"Somthing went Wrong"}
@@ -379,13 +400,14 @@ def get_latest_ten():
 
 @app.route("/AvailableHouses")
 def Get_Availabe():
+
     try:
         cursor = myDB.cursor()
         query = "SELECT * FROM House WHERE avilable = 1 " #sql code to get the most recent 10 houses 
         cursor.execute(query)
         result = cursor.fetchall()
-        print(result)
-        
+
+        result = addLabels(result,cursor.description,1)        
         return {"message:":"Done","data":result}
     except:
         return {"message:":"Somthing went Wrong"}
@@ -398,15 +420,33 @@ def view_details():
             return {"message:":"Somthing went Wrong"}
         
         cursor = myDB.cursor()
+
+        #get House Details
         query = f"SELECT * FROM House WHERE id = {id}" #sql code to get the most recent 10 houses 
+        print(query)
         cursor.execute(query)
-        result = cursor.fetchone()
-        
-        return {"message:":"Done","data":result}
+        houseInfo = cursor.fetchone()
+
+        #Add The Columns Names
+        houseInfoResult=addLabels(houseInfo,cursor.description,0)
+
+        #Get the images Related To That House 
+        query = f"SELECT * FROM images WHERE HouseID = {id}" #sql code to get the most recent 10 houses 
+        print(query)
+        cursor.execute(query)
+        images = cursor.fetchall()
+
+        #Add The Columns Names
+        imagesInfo = addLabels(images,cursor.description,1)
+
+        #Put Images in All Data
+        houseInfoResult['images'] = imagesInfo
+
+        return {"message:":"Done","data":houseInfoResult}
     except:
         return {"message:":"Somthing went Wrong"}
     
-            
+
 @app.route("/booking", methods=["POST"])
 def renter_booking():
     try:
