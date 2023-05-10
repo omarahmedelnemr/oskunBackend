@@ -393,9 +393,9 @@ def get_latest_ten():
         
         result = addLabels(result,cursor.description,1)
 
-        return {"message:":"Done","data":result}
+        return {"message":"Done","data":result}
     except:
-        return {"message:":"Somthing went Wrong"}
+        return {"message":"Somthing went Wrong"}
 
 
 @app.route("/AvailableHouses")
@@ -408,16 +408,16 @@ def Get_Availabe():
         result = cursor.fetchall()
 
         result = addLabels(result,cursor.description,1)        
-        return {"message:":"Done","data":result}
+        return {"message":"Done","data":result}
     except:
-        return {"message:":"Somthing went Wrong"}
+        return {"message":"Somthing went Wrong"}
 
 @app.route("/HouseDetails")
 def view_details():
     try:
         id = request.args.get("id")
         if id ==None:
-            return {"message:":"Somthing went Wrong"}
+            return {"message":"Somthing went Wrong"}
         
         cursor = myDB.cursor()
 
@@ -442,9 +442,9 @@ def view_details():
         #Put Images in All Data
         houseInfoResult['images'] = imagesInfo
 
-        return {"message:":"Done","data":houseInfoResult}
+        return {"message":"Done","data":houseInfoResult}
     except:
-        return {"message:":"Somthing went Wrong"}
+        return {"message":"Somthing went Wrong"}
     
 
 @app.route("/booking", methods=["POST"])
@@ -467,11 +467,11 @@ def renter_booking():
         cursor.execute(query)
         myDB.commit()
         # Return success response
-        return {"message:":"Done"}
+        return {"message":"Done"}
         
 
     except:
-        return {"message:":"Somthing went Wrong"}
+        return {"message":"Somthing went Wrong"}
 
 
 @app.route('/unbooking', methods=['POST'])
@@ -492,9 +492,9 @@ def unbooking():
         
 
         # Return success message
-        return {"message:":"Done"}
+        return {"message":"Done"}
     except:
-        return {"message:":"Somthing went Wrong"}
+        return {"message":"Somthing went Wrong"}
 
 
 
@@ -514,7 +514,7 @@ def extend_booking():
         result = cursor.fetchone()
         print(result)
         if result ==None:
-            return {"message:":"Somthing went Wrong"}
+            return {"message":"Somthing went Wrong"}
         
         # Update checkout date in database
         query = f"UPDATE RentingActivity SET endDate = '{extensionDate}' WHERE id = {booking_id}"
@@ -522,9 +522,9 @@ def extend_booking():
         cursor.execute(query)
         myDB.commit()
 
-        return {"message:":"Done"}
+        return {"message":"Done"}
     except:
-        return {"message:":"Somthing went Wrong"}
+        return {"message":"Somthing went Wrong"}
     
 
 
