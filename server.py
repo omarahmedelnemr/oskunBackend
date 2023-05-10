@@ -245,15 +245,11 @@ def hist():
 
         his = addLabels(his,cursor.description,1)
         houseHistory = []
-        print(his)
         for i in his:
             cursor.execute(f"SELECT * FROM House WHERE id = {i['house']}")
             house = cursor.fetchone()
-            print("hello")
             house = addLabels(house,cursor.description,0)
-            print(house)
             house['history'] = i
-            print("house: ",house)
             houseHistory.append(house) 
 
         return {"message":"Done","data":houseHistory}
