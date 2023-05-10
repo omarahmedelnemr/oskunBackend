@@ -249,6 +249,7 @@ def update_user():
 
 
         sql = f"UPDATE User SET name = '{name}', email = '{email}' ,phoneNumber = '{phone_number}' WHERE id = {idd}"
+        print(sql)
         cursor.execute(sql)
         myDB.commit()
         
