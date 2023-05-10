@@ -26,39 +26,40 @@ def Home():
 # Endpoint for user login
 @app.route('/login', methods=['POST'])
 def login():
-    email = request.json.get('email')
-    password = request.json.get('password')
+    try:
 
-    
+        email = request.json.get('email')
+        password = request.json.get('password')
 
-    # Check if the user exists in the Users table
-    query = f"SELECT * FROM User WHERE email = '{email}' AND password = '{password}'"
-    print(query)
-    cursor.execute(query)
-    user = cursor.fetchone()
-    cursor.close()
-    print(user)
-    # Close the database connection
-    if user:
-        print("INside ")
-        # Generate JWT token
-        payload = {
-            'id': user[0],
-            'name': user[1],
-            'email': user[2],
-            'phoneNumber':user[4],
-            'imgDir':user[6]
-        }
-        token = jwt.encode(payload, 'oskun', algorithm='HS256')
+        
 
-        # Set JWT as a cookie in the response
-        response = make_response(jsonify({'message': 'Done',"token":token}))
-        response.set_cookie('token', token)
+        # Check if the user exists in the Users table
+        query = f"SELECT * FROM User WHERE email = '{email}' AND password = '{password}'"
+        print(query)
+        cursor.execute(query)
+        user = cursor.fetchone()
+        cursor.close()
+        # Close the database connection
+        if user:
+            # Generate JWT token
+            payload = {
+                'id': user[0],
+                'name': user[1],
+                'email': user[2],
+                'phoneNumber':user[4],
+                'imgDir':user[6]
+            }
+            token = jwt.encode(payload, 'oskun', algorithm='HS256')
 
-        return response, 200
-    else:
-        return jsonify({'message': 'Somthing went Wrong'}), 200
+            # Set JWT as a cookie in the response
+            response = make_response(jsonify({'message': 'Done',"token":token}))
+            response.set_cookie('token', token)
 
+            return response, 200
+        else:
+            return jsonify({'message': 'Somthing went Wrong'}), 200
+    except:
+            return jsonify({'message': 'Somthing went Wrong'}), 200
 
 
 
