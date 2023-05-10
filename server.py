@@ -93,7 +93,7 @@ def signup():
         name = request.json.get('name')
         phonenumber = request.json.get('phonenumber')
         password = request.json.get('password')
-        imgDir = 'https;//None.png'
+        imgDir = 'https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg'
 
         # Connect to the MySQL database
         
