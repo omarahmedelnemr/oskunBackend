@@ -239,11 +239,24 @@ def hist():
     if id ==None:
         return {"message":"Somthing went Wrong"}
     else:
+
         cursor.execute(f"SELECT * FROM History WHERE id =  {id}" )
         his = cursor.fetchall()
 
         his = addLabels(his,cursor.description,1)
-        return {"message":"Done","data":his}
+        houseHistory = []
+        print(his)
+        for i in his:
+            cursor.execute(f"SELECT * FROM House WHERE id = {i['house']}")
+            house = cursor.fetchone()
+            print("hello")
+            house = addLabels(house,cursor.description,0)
+            print(house)
+            house['history'] = i
+            print("house: ",house)
+            houseHistory.append(house) 
+
+        return {"message":"Done","data":houseHistory}
 
 @app.route('/addhouse', methods=['POST'])
 def add_property():
