@@ -37,8 +37,9 @@ def login():
         query = f"SELECT * FROM User WHERE email = '{email}' AND password = '{password}'"
         print(query)
         cursor.execute(query)
-        user = cursor.fetchone()
+        user = cursor.fetchall()
         cursor.close()
+        print(user)
         # Close the database connection
         if user:
             # Generate JWT token
