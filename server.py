@@ -245,13 +245,10 @@ def update_user():
         idd = request.json.get('id')
         name = request.json.get('name')
         email = request.json.get('email')
-        password = request.json.get('password')
         phone_number = request.json.get('phoneNumber')
-        showNumber = request.json.get('showNumber')
-        img_dir = request.args.get('imgDir')
 
 
-        sql = f"UPDATE User SET name = '{name}', email = '{email}', password = '{password}',imgDir = '{img_dir}' ,phoneNumber = '{phone_number}', showNumber = {showNumber} WHERE id = {idd}"
+        sql = f"UPDATE User SET name = '{name}', email = '{email}' ,phoneNumber = '{phone_number}' WHERE id = {idd}"
         cursor.execute(sql)
         myDB.commit()
         
