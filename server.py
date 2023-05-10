@@ -125,7 +125,7 @@ def signup():
             'id':newUser[0],
             'name': newUser[1],
             'email': newUser[2],
-            'phonenumber': newUser[4],
+            'phoneNumber': newUser[4],
             'imgDir': newUser[6]
         }
         token = jwt.encode(payload, 'oskun', algorithm='HS256')
