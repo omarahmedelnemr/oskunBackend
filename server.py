@@ -41,7 +41,8 @@ def login():
         cursor.close()
         print(user)
         # Close the database connection
-        if user:
+        if len(user)!=0:
+            user=user[0]
             # Generate JWT token
             payload = {
                 'id': user[0],
