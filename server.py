@@ -537,6 +537,11 @@ def renter_booking():
         cursor = myDB.cursor()
         query = f"INSERT INTO RentingActivity VALUES (default , {House_id}, {user_id}, '{start_date}', '{end_date}', {price},{willRenew})"
         cursor.execute(query)
+
+
+        query = f"UPDATE House SET avilable=0 WHERE id={House_id}"
+        cursor.execute(query)
+
         myDB.commit()
         # Return success response
         cursor.close()
