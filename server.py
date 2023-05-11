@@ -42,8 +42,9 @@ def Home():
 # Endpoint for user login
 @app.route('/login', methods=['POST'])
 def login():
+    cursor = myDB.cursor()
+
     try: 
-        cursor = myDB.cursor()
 
         email = request.json.get('email')
         password = request.json.get('password')
@@ -52,7 +53,7 @@ def login():
 
         # Check if the user exists in the Users table
         query = f"SELECT * FROM User WHERE email = '{email}' AND password = '{password}'"
-        print(query)
+        print(f"Query ;{query}")
         cursor.execute(query)
         user = cursor.fetchall()
         
@@ -70,29 +71,23 @@ def login():
             }
             token = jwt.encode(payload, 'oskun', algorithm='HS256')
 
-            # Set JWT as a cookie in the response
-            response = make_response(jsonify({'message': 'Done',"token":token}))
-            response.set_cookie('token', token)
-            print ("Done")
-            cursor.close()
-            return response, 200
+            response =  jsonify({'message': 'Done',"token":token})
         else:
-            cursor.close()
-
-            print('Somthing went Wrong')
-            return jsonify({'message': 'Somthing went Wrong'}), 200
-    except:
-            print('Somthing went Wrong')
             
-            return jsonify({'message': 'Somthing went Wrong'}), 200
+            response =  jsonify({'message': 'Somthing went Wrong'})
+    except:
+            
+            response = jsonify({'message': 'Somthing went Wrong'})
 
-
+    cursor.close()
+    print(response)
+    return response
 
 # Endpoint for user signup
 @app.route('/register', methods=['POST'])
 def signup():
+    cursor = myDB.cursor()
     try: 
-        cursor = myDB.cursor()
 
         email = request.json.get('email')
         name = request.json.get('name')
@@ -137,22 +132,22 @@ def signup():
         token = jwt.encode(payload, 'oskun', algorithm='HS256')
 
         # Return the token in the response
-        cursor.close()
-        return jsonify({"message":"Done",'token': token})
+        response =  jsonify({"message":"Done",'token': token})
     except:
-        return jsonify({'message': "Somthing went Wrong"})
+        response =  jsonify({'message': "Somthing went Wrong"})
 
 
+    cursor.close()
+    print(response)
+    return response
 
 @app.route('/updatepassword',methods= ['POST'])
 def update():
+    cursor = myDB.cursor()
     try:
-        cursor = myDB.cursor()
 
         email = request.json.get("email")
         password = request.json.get("newPassword")
-
-         
 
         # Insert a new user into the Users table
         query = f"UPDATE User SET password = '{password}' WHERE email = '{email}'"
@@ -160,10 +155,13 @@ def update():
         cursor.execute(query)
         myDB.commit()
         
-        cursor.close()
-        return jsonify({"message":"Done"})
+        response =  jsonify({"message":"Done"})
     except:
-        return jsonify({'message': "Somthing went Wrong"})
+        response =  jsonify({'message': "Somthing went Wrong"})
+
+    cursor.close()
+    print(response)
+    return response
 
 
 @app.route('/changePassword',methods= ['POST'])
