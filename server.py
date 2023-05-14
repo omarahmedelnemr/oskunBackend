@@ -266,7 +266,7 @@ def hist():
         try:
             cursor = myDB.cursor()
 
-            cursor.execute(f"SELECT * FROM History WHERE id =  {id}" )
+            cursor.execute(f"SELECT * FROM History WHERE userID =  {id}" )
             his = cursor.fetchall()
 
             his = addLabels(his,cursor.description,1)
