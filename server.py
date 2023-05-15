@@ -10,10 +10,10 @@ CORS(app)
 
 # MySQL configuration
 myDB = mysql.connector.connect(
-    host = 'mysql-124748-0.cloudclusters.net',
-    port = 18166,
+    host = 'mysql-126454-0.cloudclusters.net',
+    port = 10008,
     user = 'admin',
-    password = 'wXA5BMti',
+    password = 'dUWDxqxb',
     database = 'oskun'    
 )
 
